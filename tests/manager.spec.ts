@@ -1,30 +1,13 @@
-import { mkdtemp, rm, stat } from 'node:fs/promises'
+import { mkdtemp, readFile, rm, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { Context } from '@deepseek-ai/cordis'
-import { SettingsProvider } from '@deepseek-ai/dsh-settings'
-import type { SettingsNamespace } from '@deepseek-ai/dsh-settings'
 import RemoteSshManager from '../src/routing/manager.ts'
 import { describe, expect, it } from 'vitest'
 
-class MemorySettings extends SettingsProvider {
-  private storedDocument: Record<string, unknown> = {}
-
-  get writable(): boolean { return true }
-
-  protected load(): Promise<Record<string, unknown>> {
-    return Promise.resolve(structuredClone(this.storedDocument))
-  }
-
-  protected persist(namespace: SettingsNamespace, section: Record<string, unknown>): Promise<void> {
-    this.storedDocument = { ...this.storedDocument, [namespace]: structuredClone(section) }
-    return Promise.resolve()
-  }
-}
-
 async function createContext(): Promise<Context> {
   const ctx = new Context()
-  await ctx.plugin(MemorySettings).await()
+  ctx.provide('settings', {} as typeof ctx.settings)
   return ctx
 }
 
@@ -33,7 +16,7 @@ describe('RemoteSshManager', () => {
     const root = await mkdtemp(join(tmpdir(), 'dsh-ssh-workspace-manager-'))
     const ctx = await createContext()
     try {
-      await ctx.plugin(RemoteSshManager, { aliasRoot: root })
+      await ctx.plugin(RemoteSshManager, { aliasRoot: join(root, 'workspaces') })
       const manager = ctx.remoteSshManager
       expect(manager.snapshot()).toMatchObject({
         openFileMode: 'auto',
@@ -53,6 +36,14 @@ describe('RemoteSshManager', () => {
       })
       await manager.updateUserPreferences({ openFileMode: 'download', openFileEditorPath: '' })
       expect(manager.snapshot().openFileEditorPath).toBeUndefined()
+      const saved = JSON.parse(await readFile(join(root, 'config.json'), 'utf8'))
+      expect(saved.openFileMode).toBe('download')
+      const restored = await createContext()
+      try {
+        await restored.plugin(RemoteSshManager, { aliasRoot: join(root, 'workspaces') })
+        expect(restored.remoteSshManager.snapshot().openFileMode).toBe('download')
+        expect(restored.remoteSshManager.snapshot().sshConfigFile).toBe(resolve(root, 'ssh-config'))
+      } finally { await restored.fiber.dispose() }
     } finally {
       await ctx.fiber.dispose()
       await rm(root, { recursive: true, force: true })
@@ -64,11 +55,11 @@ describe('RemoteSshManager', () => {
     const ctx = await createContext()
     try {
       await ctx.plugin(RemoteSshManager, {
-        aliasRoot: root,
+        aliasRoot: join(root, 'workspaces'),
         servers: [{ id: 'devbox', label: 'Devbox', sshTarget: 'test-devbox' }],
         workspaces: [{ id: 'project', serverId: 'devbox', remotePath: '/srv/project' }],
       })
-      const alias = resolve(root, 'project')
+      const alias = resolve(root, 'workspaces', 'project')
       const route = ctx.remoteSshManager.route('src/index.ts', alias)
       expect(route).toMatchObject({
         kind: 'remote',
@@ -92,13 +83,13 @@ describe('RemoteSshManager', () => {
     const ctx = await createContext()
     try {
       await ctx.plugin(RemoteSshManager, {
-        aliasRoot: root,
+        aliasRoot: join(root, 'workspaces'),
         servers: [{ id: 'devbox', label: 'Devbox', sshTarget: 'test-devbox' }],
         workspaces: [{ id: 'project', serverId: 'devbox', remotePath: '/srv/project' }],
       })
       const manager = ctx.remoteSshManager
       const owner = {}
-      manager.bindSession('remote-session', owner, resolve(root, 'project'))
+      manager.bindSession('remote-session', owner, resolve(root, 'workspaces', 'project'))
 
       expect(manager.sessionRoute('remote-session')).toMatchObject({
         kind: 'remote',
@@ -131,7 +122,7 @@ describe('RemoteSshManager', () => {
     const ctx = await createContext()
     try {
       await ctx.plugin(RemoteSshManager, {
-        aliasRoot: root,
+        aliasRoot: join(root, 'workspaces'),
         servers: [{ id: 'devbox', label: 'Devbox', sshTarget: 'test-devbox' }],
         workspaces: [{ id: 'project', serverId: 'devbox', remotePath: '/srv/project' }],
       })
@@ -150,7 +141,7 @@ describe('RemoteSshManager', () => {
     const ctx = await createContext()
     try {
       await ctx.plugin(RemoteSshManager, {
-        aliasRoot: root,
+        aliasRoot: join(root, 'workspaces'),
         servers: [{ id: 'devbox', label: 'Devbox', sshTarget: 'test-devbox' }],
         workspaces: [{ id: 'project', serverId: 'devbox', remotePath: '/srv/project' }],
       })
@@ -171,7 +162,7 @@ describe('RemoteSshManager', () => {
     const ctx = await createContext()
     try {
       await expect(ctx.plugin(RemoteSshManager, {
-        aliasRoot: root,
+        aliasRoot: join(root, 'workspaces'),
         servers: [],
         workspaces: [{ id: 'project', serverId: 'missing', remotePath: '/srv/project' }],
       })).rejects.toThrow(/unknown server 'missing'/)
@@ -186,12 +177,12 @@ describe('RemoteSshManager', () => {
     const ctx = await createContext()
     try {
       await ctx.plugin(RemoteSshManager, {
-        aliasRoot: root,
+        aliasRoot: join(root, 'workspaces'),
         servers: [{ id: 'devbox', label: 'Devbox', sshTarget: 'test-devbox' }],
         workspaces: [{ id: 'project', serverId: 'devbox', remotePath: '/srv/project' }],
       })
       const manager = ctx.remoteSshManager
-      const alias = resolve(root, 'project')
+      const alias = resolve(root, 'workspaces', 'project')
       await manager.removeWorkspace('project')
 
       expect((await stat(alias)).isDirectory()).toBe(true)
@@ -214,7 +205,7 @@ describe('RemoteSshManager', () => {
     const ctx = await createContext()
     try {
       await ctx.plugin(RemoteSshManager, {
-        aliasRoot: root,
+        aliasRoot: join(root, 'workspaces'),
         servers: [{ id: 'devbox', label: 'Devbox', sshTarget: 'test-devbox' }],
         workspaces: [
           { id: 'project-a', serverId: 'devbox', remotePath: '/srv/project-a' },
@@ -248,7 +239,7 @@ describe('RemoteSshManager', () => {
       const stillShared = await manager.workspaceContext(manager.workspace('project-b'))
       expect(creations).toBe(1)
       expect(stillShared.remote).toBe(sharedRemote)
-      expect(() => manager.route(undefined, resolve(root, 'project-a'))).toThrow(/no longer configured/)
+      expect(() => manager.route(undefined, resolve(root, 'workspaces', 'project-a'))).toThrow(/no longer configured/)
     } finally {
       await ctx.fiber.dispose()
       await rm(root, { recursive: true, force: true })
@@ -260,7 +251,7 @@ describe('RemoteSshManager', () => {
     const ctx = await createContext()
     try {
       await ctx.plugin(RemoteSshManager, {
-        aliasRoot: root,
+        aliasRoot: join(root, 'workspaces'),
         servers: [{ id: 'devbox', label: 'Devbox', sshTarget: 'test-devbox' }],
         workspaces: [],
       })
