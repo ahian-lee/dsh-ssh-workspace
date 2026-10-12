@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { resolve } from 'node:path'
 import { once } from 'node:events'
 import { ActionType } from '@microsoft/agent-host-protocol'

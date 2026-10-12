@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { applyEntryPatches, entryListSchema, type PatchOptions } from '@deepseek-ai/cordis-plugin-include'

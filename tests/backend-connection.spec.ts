@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { describe, expect, it } from 'vitest'
 import {
   RemoteDshHostConnection,

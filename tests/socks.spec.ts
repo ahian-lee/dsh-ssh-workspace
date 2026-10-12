@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { once } from 'node:events'
 import { createServer, Socket, type Server } from 'node:net'
 import { afterEach, describe, expect, it } from 'vitest'

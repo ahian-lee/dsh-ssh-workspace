@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { randomUUID } from 'node:crypto'
 import { ActionType } from '@microsoft/agent-host-protocol'
 import { AhpClient } from '@microsoft/agent-host-protocol/client'

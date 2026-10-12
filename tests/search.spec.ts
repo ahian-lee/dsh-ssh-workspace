@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { resolve } from 'node:path'
 import { WorkspacePathMapper } from '../src/transport/runtime.ts'
 import type { RemoteWorkspaceRoute } from '../src/routing/manager.ts'

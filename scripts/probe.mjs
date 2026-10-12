@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { AhpClient } from '@microsoft/agent-host-protocol/client'
 import { WebSocketTransport } from '@microsoft/agent-host-protocol/ws'
 

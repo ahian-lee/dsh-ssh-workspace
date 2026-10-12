@@ -1,3 +1,4 @@
+# Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 # Transparent local/Remote SSH execution. The model-facing tool catalog stays
 # ordinary: fs, bash, pwsh, glob, grep, and jobs select an execution world from
 # the workspace cwd instead of exposing remote_* alternatives.

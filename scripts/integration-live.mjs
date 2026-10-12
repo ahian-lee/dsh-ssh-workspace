@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { Context } from '@deepseek-ai/cordis'
 import RemoteSshRuntime from '../lib/index.js'
 import RemoteSshFileSystem from '../lib/fs.js'

@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { describe, expect, it } from 'vitest'
 import { parseSshWorkspaceUri, remoteWorkspaceCommand, resolveSshWorkspacePath, sshWorkspaceUri } from '../src/profiles/tui.ts'
 import type { RemoteWorkspaceRoute } from '../src/routing/manager.ts'

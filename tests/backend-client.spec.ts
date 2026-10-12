@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { createHash, randomUUID } from 'node:crypto'
 import { createServer, type Server } from 'node:http'
 import type { Duplex } from 'node:stream'

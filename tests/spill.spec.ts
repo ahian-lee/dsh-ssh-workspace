@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import type { SaveTextSpill } from '@deepseek-ai/dsh-spill'
 import { WorkspacePathMapper } from '../src/transport/runtime.ts'
 import type { RemoteSshManager, RemoteWorkspaceRoute } from '../src/routing/manager.ts'

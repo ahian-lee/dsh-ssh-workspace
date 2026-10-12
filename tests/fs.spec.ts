@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { resolve } from 'node:path'
 import { AhpErrorCodes } from '@microsoft/agent-host-protocol'
 import type { AhpClient } from '@microsoft/agent-host-protocol/client'

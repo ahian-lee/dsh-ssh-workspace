@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import { describe, expect, it, vi } from 'vitest'
 import { RemoteHostChannel } from '../src/tui/remote-channel.ts'
 

@@ -1,3 +1,4 @@
+// Derived from Yan-Zero/dsh-remote-ssh; modified by ahian-lee. See NOTICE.
 import type { UserConfig } from "tsdown";
 
 const PLUGIN_ID = "dsh-ssh-workspace";
