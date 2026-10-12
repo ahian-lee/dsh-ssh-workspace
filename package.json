@@ -1,0 +1,191 @@
+{
+  "name": "dsh-ssh-workspace",
+  "version": "1.0.0",
+  "description": "Transparent SSH workspaces for DeepSeek Harness Desktop 0.2: local runtime, remote files, search and Bash.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahian-lee/dsh-ssh-workspace.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ahian-lee/dsh-ssh-workspace/issues"
+  },
+  "homepage": "https://github.com/ahian-lee/dsh-ssh-workspace#readme",
+  "packageManager": "pnpm@11.7.0",
+  "type": "module",
+  "main": "lib/host.js",
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run",
+    "check": "pnpm run test && pnpm run build",
+    "pack:release": "pnpm pack --out dsh-ssh-workspace.tgz"
+  },
+  "exports": {
+    ".": "./lib/host.js",
+    "./runtime": "./lib/index.js",
+    "./fs": "./lib/fs.js",
+    "./shell": "./lib/shell.js",
+    "./search": "./lib/search.js",
+    "./manager": "./lib/manager.js",
+    "./backend/web": "./lib/backend.js",
+    "./backend/client": "./lib/backend-client.js",
+    "./backend/control": "./lib/backend-control.js",
+    "./backend/connection": "./lib/backend-connection.js",
+    "./backend/tunnel": "./lib/backend-tunnel.js",
+    "./router-fs": "./lib/router-fs.js",
+    "./router-subprocess": "./lib/router-subprocess.js",
+    "./spill": "./lib/spill.js",
+    "./local-bridge": "./lib/local-bridge.js",
+    "./shell-transparent": "./lib/shell-transparent.js",
+    "./agent-policy": "./lib/agent-policy.js",
+    "./tui-backend": "./lib/tui-backend.js",
+    "./tui": "./lib/tui.js",
+    "./web": "./lib/web.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json",
+    "./icon.svg": "./icon.svg"
+  },
+  "files": [
+    "lib",
+    "src",
+    "scripts",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md",
+    "INSTALL.md",
+    "docs",
+    "DESKTOP-COMPAT.md",
+    "tsconfig.desktop.json",
+    "tsconfig.json",
+    "tsdown.config.ts",
+    "NOTICE",
+    "CHANGELOG.md",
+    "icon.svg"
+  ],
+  "license": "Apache-2.0",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-ui-settings-plugins",
+        "@deepseek-ai/dsh-client-ui-workspace",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-session"
+      ],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-harness-tui/dsh-tui": "^0.7.0",
+    "dsh-host": "^0.1.0",
+    "@deepseek-ai/cordis": "^4.0.1-rc.1",
+    "@deepseek-ai/dsh-agent": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-fs": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-fs-local": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-fs-sandbox": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-settings": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-spill": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-spill-local": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-subprocess": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-subprocess-local": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-bash-local": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-pwsh-local": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-tool-bash": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-tool-pwsh": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-workspace": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-host-webserver": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-host-apiproxy": "*",
+    "@deepseek-ai/dsh-host-directory-picker-browse": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-runtime": "*",
+    "@deepseek-ai/dsh-client-locale": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-slots": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-settings-plugins": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-workspace": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-sandbox": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-shell": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-system-prompt": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-tools": "^0.2.0-rc.2",
+    "@deepseek-ai/schemastery": "^3.18.1-rc.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-harness-tui/dsh-tui": {
+      "optional": true
+    },
+    "dsh-host": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-host-apiproxy": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-runtime": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@microsoft/agent-host-protocol": "0.7.0"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/cordis-plugin-include": "1.0.9",
+    "@deepseek-ai/cordis-plugin-loader": "1.0.5",
+    "@deepseek-ai/dsh-agent": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-fs": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-fs-local": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-fs-sandbox": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-settings": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-spill": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-spill-local": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-subprocess": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-subprocess-local": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-bash-local": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-pwsh-local": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-tool-bash": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-tool-pwsh": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-workspace": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-host-webserver": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-host-apiproxy": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-host-directory-picker-browse": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-runtime": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-client-ui-settings": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-settings-plugins": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-workspace": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-slots": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-locale": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-sandbox": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-scope": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-shell": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-system-prompt": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+    "@deepseek-ai/schemastery": "3.18.4",
+    "@types/node": "26.6.3",
+    "@types/react": "~18.3.1",
+    "@types/js-yaml": "^4.0.9",
+    "js-yaml": "4.3.2",
+    "react": "^18.2.0",
+    "tsdown": "^0.22.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.8"
+  },
+  "author": "ahian-lee",
+  "engines": {
+    "node": ">=22",
+    "dsh": "^0.2.0-rc.2"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "ssh",
+    "remote-workspace"
+  ],
+  "icon": "./icon.svg",
+  "meta": {
+    "title": "SSH Workspace",
+    "description": "Local DSH runtime with transparent SSH file, search and Bash routing."
+  }
+}

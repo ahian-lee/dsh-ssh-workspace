@@ -1,0 +1,171 @@
+# Transparent local/Remote SSH execution. The model-facing tool catalog stays
+# ordinary: fs, bash, pwsh, glob, grep, and jobs select an execution world from
+# the workspace cwd instead of exposing remote_* alternatives.
+
+- insert:
+    # Bare package row makes the dsh.client manifest discoverable. Its node
+    # half is intentionally empty; provider rows below stay independently HMR-able.
+    - id: remote-ssh-client-host
+      name: dsh-ssh-workspace
+
+    # Preserve the shipped local providers in a private realm. The bridge
+    # publishes them under non-conflicting names consumed by the root routers.
+    - id: remote-ssh-local-world
+      name: cordis:group
+      group: true
+      isolate:
+        fs: true
+        spillStore: true
+        subprocess: true
+        shell: true
+      config:
+        - id: local-subprocess
+          name: '@deepseek-ai/dsh-subprocess-local'
+        - id: local-fs
+          name: '@deepseek-ai/dsh-fs-sandbox'
+        - id: local-spill
+          name: '@deepseek-ai/dsh-spill-local'
+        - id: local-shell
+          name: '@deepseek-ai/dsh-pwsh-sandbox'
+        - id: bridge
+          name: dsh-ssh-workspace/local-bridge
+          inject: [fs, subprocess, spillStore, shell]
+
+    - id: remote-ssh-manager
+      name: dsh-ssh-workspace/manager
+      inject: [settings]
+      config:
+        aliasRoot: !!js process.env.DSH_REMOTE_SSH_ALIAS_ROOT ?? dshHomePath('remote-ssh/workspaces')
+        servers: !!js >-
+          process.env.DSH_REMOTE_SSH_TARGET
+            ? [{ id: 'default', label: process.env.DSH_REMOTE_SSH_LABEL ?? process.env.DSH_REMOTE_SSH_TARGET, sshTarget: process.env.DSH_REMOTE_SSH_TARGET, remoteCodeCommand: process.env.DSH_REMOTE_SSH_CODE ?? 'code' }]
+            : []
+        workspaces: !!js >-
+          process.env.DSH_REMOTE_SSH_TARGET && process.env.DSH_REMOTE_SSH_WORKSPACE
+            ? [{ id: 'default', serverId: 'default', remotePath: process.env.DSH_REMOTE_SSH_WORKSPACE, ...(process.env.DSH_REMOTE_SSH_LOCAL_WORKSPACE ? { aliasPath: process.env.DSH_REMOTE_SSH_LOCAL_WORKSPACE } : {}) }]
+            : []
+
+    # Optional Remote Host adapter for dsh-tui's public backend registry.
+    # Only the manager is an entry-level dependency: the plugin observes the
+    # optional tuiBackends service internally, so this same bundle also boots
+    # in Web and other UI-neutral profiles where dsh-tui is absent.
+    - id: remote-ssh-tui-backend
+      name: dsh-ssh-workspace/tui-backend
+      inject: [remoteSshManager]
+
+    - id: remote-ssh-web
+      name: dsh-ssh-workspace/web
+      inject: [remoteSshManager]
+
+    # Both LOCAL and Remote use this plugin's in-app browser. The Host browse
+    # backend supplies local listings; Remote listings come from SSH/AHP.
+    - id: remote-ssh-directory-browser
+      name: '@deepseek-ai/dsh-host-directory-picker-browse'
+      disabled: true
+
+    - id: remote-ssh-fs-router
+      name: dsh-ssh-workspace/router-fs
+      inject: [localFs, remoteSshManager]
+
+    - id: remote-ssh-subprocess-router
+      name: dsh-ssh-workspace/router-subprocess
+      inject: [localSubprocess, remoteSshManager]
+
+    - id: remote-ssh-spill-router
+      name: dsh-ssh-workspace/spill
+      inject: [localSpillStore, remoteSshManager]
+
+    - id: remote-ssh-search
+      name: dsh-ssh-workspace/search
+      inject: [remoteSshManager]
+
+    # Preserve the process-host dialect for non-tool shell consumers (hooks,
+    # permission capability inspection). Visible bash/pwsh tools below each
+    # bind their own explicit dialect while sharing the same cwd router.
+    - id: remote-ssh-shell-default
+      name: dsh-ssh-workspace/shell-transparent
+      inject: [subprocess, remoteSshManager]
+      config:
+        dialect: auto
+
+    # Official Bash keeps its complete contract. Every call opens an AHP
+    # terminal channel on the host's pooled SSH/AHP connection; it does not
+    # perform another SSH handshake.
+    - id: remote-ssh-bash
+      name: cordis:group
+      group: true
+      isolate:
+        shell: true
+      config:
+        - id: remote-ssh-bash-shell
+          name: dsh-ssh-workspace/shell-transparent
+          inject: [subprocess, remoteSshManager]
+          config:
+            dialect: bash
+        - id: remote-ssh-bash-tool
+          name: '@deepseek-ai/dsh-tool-bash'
+          inject: [tools, shell, systemPrompt, shellEnv]
+
+    - id: remote-ssh-pwsh
+      name: cordis:group
+      group: true
+      isolate:
+        shell: true
+      config:
+        - id: remote-ssh-pwsh-executor
+          name: dsh-ssh-workspace/shell-transparent
+          inject: [subprocess, remoteSshManager]
+          config:
+            dialect: pwsh
+        - id: remote-ssh-pwsh-tool
+          name: '@deepseek-ai/dsh-tool-pwsh'
+          inject: [tools, shell, systemPrompt, shellEnv]
+
+    # Shell names remain ordinary, but each Agent sees only the dialect of its
+    # workspace OS. The host connection is shared; command channels are isolated.
+    - id: remote-ssh-agent-policy
+      name: dsh-ssh-workspace/agent-policy
+      inject: [agents, remoteSshManager, systemPrompt, tools]
+
+    # Optional terminal front-door adapter. It stays dormant on Web because
+    # tuiWorkspaces is absent, and registers /workspace targets when dsh-tui
+    # is part of the same profile.
+    - id: remote-ssh-tui
+      name: dsh-ssh-workspace/tui
+      inject: [remoteSshManager]
+
+# Replace only capability providers; callers and visible tool names do not
+# change. A remote search therefore reuses tool-fs-search through the routed
+# subprocess service and resolves `rg` inside the remote execution world.
+- id: subprocess
+  disabled: true
+
+- id: fs-sandbox
+  disabled: true
+
+- id: bash-sandbox
+  disabled: true
+
+- id: pwsh-sandbox
+  disabled: true
+
+- id: tool-bash
+  disabled: true
+
+- id: tool-pwsh
+  disabled: true
+
+- id: tool-fs-search
+  disabled: true
+
+# Existing/restored sessions cause presets to mount during startup. Hold the
+# roster until the module-load hook is active, so its scoped search tool is
+# parsed through the remote-aware path entry from its first import onward.
+- id: agent-presets
+  inject: [remoteSshSearchHook]
+
+- id: spill-local
+  disabled: true
+
+
+

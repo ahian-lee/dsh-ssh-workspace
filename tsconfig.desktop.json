@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/routing",
+    "src/transport",
+    "src/ssh",
+    "src/backend",
+    "src/profiles/host.ts",
+    "src/profiles/web.ts"
+  ],
+  "exclude": [
+    "src/tui",
+    "src/client",
+    "src/profiles/tui.ts",
+    "src/profiles/tui-backend.ts"
+  ]
+}

@@ -1,0 +1,2 @@
+import { defineConfig } from 'vitest/config'
+export default defineConfig({ resolve: { alias: process.env.DSH_TEST_RUNTIME ? { '@deepseek-ai/cordis-plugin-include': process.env.DSH_TEST_RUNTIME + '/@deepseek-ai/cordis-plugin-include/lib/index.js' } : {} }, test: { include: ['tests/fs.spec.ts', 'tests/shell.spec.ts', 'tests/manager.spec.ts', 'tests/router-subprocess.spec.ts', 'tests/bundle.spec.ts', 'tests/ssh-config.spec.ts', 'tests/path-mapper.spec.ts', 'tests/ahp-compat.spec.ts', 'tests/socks.spec.ts'] } })

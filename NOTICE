@@ -1,0 +1,12 @@
+dsh-ssh-workspace
+
+Derived from dsh-remote-ssh v0.2.4 by Yan-Zero
+https://github.com/Yan-Zero/dsh-remote-ssh
+Copyright 2026 Yan-Zero
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Desktop 0.2 compatibility, workspace picker integration, packaging and UI fixes
+Copyright 2026 ahian-lee
+
+This distribution modifies the upstream project. The changed behavior is
+described in CHANGELOG.md and DESKTOP-COMPAT.md.
